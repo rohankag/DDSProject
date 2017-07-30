@@ -1,0 +1,56 @@
+Versions: 
+Hadoop --- 2.7.3
+Spark --- 1.6
+
+Video Link: https://www.youtube.com/watch?v=2Jn8Shx4UG4
+
+ssh master
+ssh worker1
+ssh worker2
+ssh worker3
+hadoop namenode -format
+cd /usr/local/hadoop/sbin
+./start-all.sh
+
+hadoop dfs -mkdir /data
+hadoop dfs -put ~/Downloads/DDS/datasets/arealm.csv /data
+hadoop dfs -put ~/Downloads/DDS/datasets/zcta510.csv /data
+hadoop dfs -ls /data
+
+cd /usr/lib/spark1.6/sbin
+./start-master.sh
+
+spark-shell --master 192.168.43.205 --jars ~/Downloads/GeoSpark_Precompile_0.3_WithDependencies.jar
+ 
+import org.datasyslab.geospark.spatialOperator.RangeQuery; 
+import org.datasyslab.geospark.spatialOperator.JoinQuery; 
+import org.datasyslab.geospark.spatialOperator.KNNQuery; 
+import org.datasyslab.geospark.spatialRDD.PointRDD; 
+import org.datasyslab.geospark.spatialRDD.RectangleRDD; 
+import com.vividsolutions.jts.geom.Envelope; 
+import com.vividsolutions.jts.geom.Coordinate; 
+import com.vividsolutions.jts.geom.GeometryFactory; 
+import com.vividsolutions.jts.geom.Point; 
+import com.vividsolutions.jts.geom.CoordinateSequence; 
+
+val qPoint = new PointRDD(sc, "hdfs://master:54310/data/arealm.csv", 0, "csv"); 
+val queryEnvelope=new Envelope (32.99,35.08,-113.79,-109.73); 
+val resultSize = RangeQuery.SpatialRangeQuery(qPoint, queryEnvelope, 0).getRawPointRDD().count(); 
+qPoint.buildIndex("rtree"); 
+val resultSize = RangeQuery.SpatialRangeQuery(qPoint, queryEnvelope, 0).getRawPointRDD().count(); 
+var gf= new GeometryFactory(); 
+var gg=new Coordinate(35.08,-113.79); 
+var pp=gf.createPoint(gg); 
+val result = KNNQuery.SpatialKnnQuery(qPoint, pp, 5); 
+qPoint.buildIndex("rtree"); 
+val result = KNNQuery.SpatialKnnQuery(qPoint, pp, 5); 
+val qPoint = new PointRDD(sc, "hdfs://master:54310/data/arealm.csv", 0, "csv","equalgrid"); 
+val qwRect = new RectangleRDD(sc, "hdfs://master:54310/data/zcta510.csv", 0, "csv","equalgrid"); 
+val joinQuery = new JoinQuery(sc,qPoint,qwRect);  
+val queryResult=joinQuery.SpatialJoinQuery(qPoint,qwRect).count; 
+qPoint.buildIndex("rtree"); 
+qwRect.buildIndex("rtree"); 
+val queryResult=joinQuery.SpatialJoinQuery(qPoint,qwRect).count; 
+val qPoint = new PointRDD(sc, "hdfs://master:54310/data/arealm.csv", 0, "csv","rtree"); 
+val qwRect = new RectangleRDD(sc, "hdfs://master:54310/data/zcta510.csv", 0, "csv","rtree"); 
+val queryResult=joinQuery.SpatialJoinQuery(qPoint,qwRect).count;

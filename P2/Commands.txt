@@ -1,0 +1,61 @@
+Versions: 
+Hadoop --- 2.7.3
+Spark --- 2.1
+
+To generate the geospark_group_deadpool.jar:
+Case1:
+Generate it using the eclipse
+Case2:
+sudo apt-get maven
+cd /Downloads/Phase2/Geospark_group_deadpool		(current directory is where the pom.xml is present)
+mvn clean compile
+mvn clean install -DskipTests
+
+(Creates the JAR in target folder)
+
+ssh master
+ssh worker1
+ssh worker2
+ssh worker3
+hadoop namenode -format
+cd /usr/local/hadoop/sbin
+./start-all.sh
+
+hadoop dfs -mkdir /data
+hadoop dfs -put ~/Downloads/datasets/arealm.csv /data
+hadoop dfs -put ~/Downloads/datasets/zcta510.csv /data
+hadoop dfs -ls /data
+
+cd /usr/lib/spark2.1/sbin
+./start-master.sh
+
+spark-shell --jars ~/Downloads/Phase2/geospark_group_deadpool.jar
+
+import org.apache.spark.storage.StorageLevel;
+import org.datasyslab.geospark.enums.GridType;
+import org.datasyslab.geospark.enums.IndexType;
+import org.datasyslab.geospark.spatialOperator.JoinQuery;
+import org.datasyslab.geospark.spatialOperator.KNNQuery;
+import org.datasyslab.geospark.enums.FileDataSplitter;
+import org.datasyslab.geospark.spatialRDD.RectangleRDD;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Envelope;
+import org.datasyslab.geospark.spatialRDD.PointRDD;
+import org.datasyslab.geospark.spatialOperator.RangeQuery;
+
+val rectangleRDD = new RectangleRDD(sc, "hdfs://master:54310/data/zcta510.csv", 0, FileDataSplitter.CSV,false,10,StorageLevel.MEMORY_ONLY);
+val pointRDD = new PointRDD(sc, "hdfs://master:54310/data/arealm.csv", 0, FileDataSplitter.CSV,false,10,StorageLevel.MEMORY_ONLY);
+val resultSize = JoinQuery.SpatialJoinQuery(pointRDD, rectangleRDD, false).count();
+pointRDD.spatialPartitioning(GridType.EQUALGRID);
+rectangleRDD.spatialPartitioning(pointRDD.grids);
+val resultSize = JoinQuery.SpatialJoinQueryWithCartesianProduct(sc, pointRDD, rectangleRDD, false).count();
+
+
+
+
+
+
+

@@ -1,0 +1,25 @@
+Versions: 
+Hadoop --- 2.7.3
+Spark --- 2.1
+
+To generate the geospark_group_deadpool.jar:
+Case1:
+Generate it using the eclipse
+Case2:
+sudo apt-get maven
+cd /Downloads/Geospark_group_deadpool   (current directory is where the pom.xml is present)
+mvn clean compile
+mvn clean install -DskipTests
+
+(Creates the JAR in target folder)
+
+
+cd /usr/lib/spark2.1/bin
+
+./spark-submit --master local[*] --class group_deadpool_phase3 ~/Downloads/Phase3/group_deadpool_phase3.jar /home/dds/Downloads/datasets/yellow_tripdata_2015-01.csv /home/dds/Downloads/Phase3/
+
+
+
+
+
+

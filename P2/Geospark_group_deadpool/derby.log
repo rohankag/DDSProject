@@ -1,0 +1,13 @@
+----------------------------------------------------------------
+Thu Apr 06 00:05:05 AKDT 2017:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.12.1.1 - (1704137): instance a816c00e-015b-424b-a346-00000c07b6d0 
+on database directory /home/dds/Downloads/Phase2_submission/CSE512_deadpool_phase2/Geospark_group_deadpool/metastore_db with class loader org.apache.spark.sql.hive.client.IsolatedClientLoader$$anon$1@25ae49a4 
+Loaded from file:/usr/lib/spark/jars/derby-10.12.1.1.jar
+java.vendor=Oracle Corporation
+java.runtime.version=1.7.0_101-b00
+user.dir=/home/dds/Downloads/Phase2_submission/CSE512_deadpool_phase2/Geospark_group_deadpool
+os.name=Linux
+os.arch=amd64
+os.version=4.2.0-42-generic
+derby.system.home=null
+Database Class Loader started - derby.database.classpath=''
